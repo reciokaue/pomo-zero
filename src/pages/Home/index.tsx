@@ -53,6 +53,7 @@ export function Home() {
       startDate: new Date(),
     }
     setCycles((state) => [...state, newCycle])
+    setTotalSecondsPassed(0)
     setActiveCycleId(id)
 
     reset()
@@ -71,11 +72,17 @@ export function Home() {
   const minutes = String(minutesAmount).padStart(2, '0')
 
   useEffect(() => {
+    let interval: number
+
     if (activeCycle) {
-      setInterval(() => {
+      interval = setInterval(() => {
         const seconds = differenceInSeconds(new Date(), activeCycle.startDate)
         setTotalSecondsPassed(seconds)
       }, 1000)
+    }
+
+    return () => {
+      clearInterval(interval)
     }
   }, [activeCycle])
 
