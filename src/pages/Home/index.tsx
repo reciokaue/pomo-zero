@@ -20,7 +20,7 @@ const newCycleFormSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
   minutesAmount: zod
     .number()
-    .min(5, 'O ciclo precisa ser de no mínimo 5 minutos')
+    // .min(5, 'O ciclo precisa ser de no mínimo 5 minutos')
     .max(60, 'O ciclo precisa ser de no máximo 60 minutos'),
 })
 type NewCycleFormData = zod.infer<typeof newCycleFormSchema>
@@ -31,6 +31,7 @@ interface Cycle {
   minutesAmount: number
   startDate: Date
   interruptedDate?: Date
+  finishedDate?: Date
 }
 
 export function Home() {
@@ -61,14 +62,12 @@ export function Home() {
     reset()
   }
   function handleInterruptCycle() {
-    setCycles(
-      cycles.map((cycle) => {
-        if (cycle.id === activeCycleId) {
-          return { ...cycle, interruptedDate: new Date() }
-        } else {
-          return cycle
-        }
-      }),
+    setCycles((state) =>
+      state.map((cycle) =>
+        cycle.id === activeCycleId
+          ? { ...cycle, interruptedDate: new Date() }
+          : cycle,
+      ),
     )
     setActiveCycleId(null)
   }
@@ -91,14 +90,25 @@ export function Home() {
     if (activeCycle) {
       interval = setInterval(() => {
         const seconds = differenceInSeconds(new Date(), activeCycle.startDate)
-        setTotalSecondsPassed(seconds)
+
+        if (seconds > totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) =>
+              cycle.id === activeCycleId
+                ? { ...cycle, finishedDate: new Date() }
+                : cycle,
+            ),
+          )
+          setActiveCycleId(null)
+          clearInterval(interval)
+        } else setTotalSecondsPassed(seconds)
       }, 1000)
     }
 
     return () => {
       clearInterval(interval)
     }
-  }, [activeCycle])
+  }, [activeCycle, activeCycleId, totalSeconds])
 
   useEffect(() => {
     if (activeCycle)
@@ -130,8 +140,8 @@ export function Home() {
             id="minutesAmount"
             placeholder="00"
             max={60}
-            step={5}
-            min={5}
+            // step={5}
+            // min={5}
             {...register('minutesAmount', { valueAsNumber: true })}
             disabled={!!activeCycle}
           />
