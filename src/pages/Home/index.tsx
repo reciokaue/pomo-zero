@@ -12,6 +12,7 @@ import {
   StartCountdownButton,
   TaskInput,
 } from './styles'
+import { useState } from 'react'
 
 const newCycleFormSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
@@ -20,16 +21,19 @@ const newCycleFormSchema = zod.object({
     .min(5, 'O ciclo precisa ser de no mínimo 5 minutos')
     .max(60, 'O ciclo precisa ser de no máximo 60 minutos'),
 })
-
 type NewCycleFormData = zod.infer<typeof newCycleFormSchema>
-// Dynamic typing data
-// interface NewCycleFormData {
-//   task: string
-//   minutesAmount: number
-// }
+
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+}
 
 export function Home() {
-  const { register, handleSubmit, watch } = useForm<NewCycleFormData>({
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormSchema),
     defaultValues: {
       task: '',
@@ -38,11 +42,22 @@ export function Home() {
   })
 
   function handleCreateNewCycle(data: NewCycleFormData) {
-    console.log(data)
+    const id = String(new Date().getTime())
+
+    const newCycle: Cycle = {
+      id,
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    }
+    setCycles((state) => [...state, newCycle])
+    setActiveCycleId(id)
+
+    reset()
   }
 
   const task = watch('task')
   const isButtonDisabled = !task
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
   return (
     <HomeContainer>
