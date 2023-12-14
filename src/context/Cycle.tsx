@@ -8,7 +8,13 @@ import {
   useState,
 } from 'react'
 import { Cycle } from '../@types/CycleForm'
-import { ActionTypes, cyclesReducer } from '../reducers/cycles'
+import { cyclesReducer } from '../reducers/cycles/reducer'
+import {
+  ActionTypes,
+  addNewCycleAction,
+  interruptCurrentCycleAction,
+  markCurrentCycleAsFinishedAction,
+} from '../reducers/cycles/actions'
 
 interface CycleProviderProps {
   children: ReactNode
@@ -53,29 +59,14 @@ export function CycleProvider({ children }: CycleProviderProps) {
       minutesAmount: data.minutesAmount,
       startDate: new Date(),
     }
-    dispatchCycle({
-      type: ActionTypes.ADD_NEW_CYCLE,
-      payload: {
-        newCycle,
-      },
-    })
+    dispatchCycle(addNewCycleAction(newCycle))
     setTotalSecondsPassed(0)
   }
   function interruptCycle() {
-    dispatchCycle({
-      type: ActionTypes.INTERRUPT_CURRENT_CYCLE,
-      payload: {
-        activeCycleId,
-      },
-    })
+    dispatchCycle(interruptCurrentCycleAction())
   }
   function markCurrentCycleFinished() {
-    dispatchCycle({
-      type: ActionTypes.MARK_CURRENT_CYCLE_AS_FINISHED,
-      payload: {
-        activeCycleId,
-      },
-    })
+    dispatchCycle(markCurrentCycleAsFinishedAction())
   }
 
   return (
