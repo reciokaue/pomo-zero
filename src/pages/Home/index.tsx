@@ -24,7 +24,7 @@ const newCycleFormSchema = zod.object({
 export type NewCycleFormData = zod.infer<typeof newCycleFormSchema>
 
 export function Home() {
-  const { handleCreateNewCycle, handleInterruptCycle, activeCycle } = useCycle()
+  const { createNewCycle, interruptCycle, activeCycle } = useCycle()
 
   const newCycleForm = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormSchema),
@@ -34,9 +34,14 @@ export function Home() {
     },
   })
 
-  const { watch, handleSubmit } = newCycleForm
+  const { watch, handleSubmit, reset } = newCycleForm
   const task = watch('task')
   const isButtonDisabled = !task
+
+  function handleCreateNewCycle(data: NewCycleFormData) {
+    createNewCycle(data)
+    reset()
+  }
 
   return (
     <HomeContainer>
@@ -47,7 +52,7 @@ export function Home() {
         <Countdown />
 
         {activeCycle ? (
-          <StopCountdownButton onClick={handleInterruptCycle} type="button">
+          <StopCountdownButton onClick={interruptCycle} type="button">
             <HandPalm size={24} />
             Interromper
           </StopCountdownButton>

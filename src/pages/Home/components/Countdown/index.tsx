@@ -8,7 +8,7 @@ export function Countdown() {
     activeCycle,
     markCurrentCycleFinished,
     totalSecondsPassed,
-    handleSetSecondsPassed,
+    setSecondsPassed,
   } = useCycle()
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
@@ -29,7 +29,7 @@ export function Countdown() {
         if (seconds > totalSeconds) {
           markCurrentCycleFinished()
           clearInterval(interval)
-        } else handleSetSecondsPassed(seconds)
+        } else setSecondsPassed(seconds)
       }, 1000)
     }
 

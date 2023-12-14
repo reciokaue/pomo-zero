@@ -16,10 +16,10 @@ interface CycleContextData {
   cycles: Cycle[]
   activeCycle: Cycle | undefined
   totalSecondsPassed: number
-  handleCreateNewCycle: (data: CreateCycleData) => void
+  createNewCycle: (data: CreateCycleData) => void
   markCurrentCycleFinished: () => void
-  handleInterruptCycle: () => void
-  handleSetSecondsPassed: (seconds: number) => void
+  interruptCycle: () => void
+  setSecondsPassed: (seconds: number) => void
 }
 
 const CycleContext = createContext({} as CycleContextData)
@@ -31,11 +31,11 @@ export function CycleProvider({ children }: CycleProviderProps) {
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
-  function handleSetSecondsPassed(seconds: number) {
+  function setSecondsPassed(seconds: number) {
     setTotalSecondsPassed(seconds)
   }
 
-  function handleCreateNewCycle(data: CreateCycleData) {
+  function createNewCycle(data: CreateCycleData) {
     const id = String(new Date().getTime())
 
     const newCycle: Cycle = {
@@ -49,7 +49,7 @@ export function CycleProvider({ children }: CycleProviderProps) {
     setActiveCycleId(id)
     // reset()
   }
-  function handleInterruptCycle() {
+  function interruptCycle() {
     setCycles((state) =>
       state.map((cycle) =>
         cycle.id === activeCycleId
@@ -76,10 +76,10 @@ export function CycleProvider({ children }: CycleProviderProps) {
         cycles,
         activeCycle,
         totalSecondsPassed,
-        handleCreateNewCycle,
+        createNewCycle,
         markCurrentCycleFinished,
-        handleInterruptCycle,
-        handleSetSecondsPassed,
+        interruptCycle,
+        setSecondsPassed,
       }}
     >
       {children}
