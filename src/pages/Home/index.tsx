@@ -1,6 +1,8 @@
 import { Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { differenceInSeconds } from 'date-fns'
 import * as zod from 'zod'
 
 import {
@@ -12,7 +14,6 @@ import {
   StartCountdownButton,
   TaskInput,
 } from './styles'
-import { useState } from 'react'
 
 const newCycleFormSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
@@ -27,6 +28,7 @@ interface Cycle {
   id: string
   task: string
   minutesAmount: number
+  startDate: Date
 }
 
 export function Home() {
@@ -48,6 +50,7 @@ export function Home() {
       id,
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     }
     setCycles((state) => [...state, newCycle])
     setActiveCycleId(id)
@@ -66,6 +69,15 @@ export function Home() {
 
   const seconds = String(secondsAmount).padStart(2, '0')
   const minutes = String(minutesAmount).padStart(2, '0')
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        const seconds = differenceInSeconds(new Date(), activeCycle.startDate)
+        setTotalSecondsPassed(seconds)
+      }, 1000)
+    }
+  }, [activeCycle])
 
   return (
     <HomeContainer>
